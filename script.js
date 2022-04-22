@@ -16,3 +16,9 @@ function div(a,b) {
     }
     return a / b;
 }
+
+window.addEventListener("load", () => {
+    const result = document.getElementsByClassName("result")[0];
+    const calc = document.getElementsByClassName("calculator")[0];
+    result.textContent = `${calc.offsetWidth} x ${calc.offsetHeight}`;
+});

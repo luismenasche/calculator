@@ -1,0 +1,10 @@
+b = backspace
+c = clear
+d = decimal point
+e = equal
+h = history
+n = number
+o = operator (except trigonometric)
+p = parentheses
+r = radian / degree
+t = trigonometric

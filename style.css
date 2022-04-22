@@ -5,7 +5,7 @@
 }
 
 :root {
-    --cols-num: 5;
+    --cols-num: 6;
     font-family: Verdana, sans-serif;
     font-size: 12pt;
 }
@@ -48,6 +48,7 @@
 
 .button {
     background-color: hsl(0,0%,70%);
+    border: none;
     font-size: 1rem;
     font-weight: bold;
     padding: 10px;
@@ -62,11 +63,67 @@
     grid-row: span 2;
 }
 
+.button[data-type="b"], .button[data-type="c"],
+.button[data-type="h"], .button[data-type="p"], .button[data-type="r"] {
+    background-color: hsl(180,70%,40%);
+}
+
+.button[data-type="h"] {
+    grid-column: span 2;
+}
+
+.button[data-type="b"] {
+    font-size: 1.1rem;
+    line-height: 1;
+    grid-column: var(--cols-num);
+}
+
+.button[data-type="t"] {
+    background-color: hsl(30,100%,55%);
+    grid-row: span 2;
+}
+
+.small {
+    font-size: 0.9rem;
+}
+
+.smaller {
+    font-size: 0.8rem;
+}
+
 .button:hover {
-    background-color: hsl(0,0%,90%);
+    outline: 2px dotted black;
 }
 
 .author {
     font-size: 0.9rem;
     text-align: center;
+}
+
+@media screen and (max-width: 500px) {
+    :root {
+        font-size: 10pt;
+    }
+
+    .calculator, .button {
+        padding: 5px;
+    }
+
+    .calculator {
+        gap: 5px;
+    }
+}
+
+@media screen and (max-height: 350px) {
+    :root {
+        font-size: 10pt;
+    }
+
+    .calculator, .button {
+        padding: 3px;
+    }
+
+    .calculator {
+        gap: 3px;
+    }
 }
