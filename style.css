@@ -40,10 +40,16 @@
 .seq {
     font-size: 2rem;
     margin-bottom: 5px;
+    overflow: hidden;
+    user-select: none;
+    white-space: nowrap;
 }
 
 .result {
     font-size: 3rem;
+    overflow: hidden;
+    user-select: none;
+    white-space: nowrap;
 }
 
 .button {
@@ -54,7 +60,8 @@
     padding: 10px;
 }
 
-.button[data-type="o"] {
+.button[data-type="o"], .button[data-type="u"], 
+.button[data-type="s"], .button[data-type="%"] {
     background-color: hsl(0,50%,45%);
 }
 
@@ -64,7 +71,8 @@
 }
 
 .button[data-type="b"], .button[data-type="c"],
-.button[data-type="h"], .button[data-type="p"], .button[data-type="r"] {
+.button[data-type="h"], .button[data-type="p"], 
+.button[data-type="r"] {
     background-color: hsl(180,70%,40%);
 }
 
