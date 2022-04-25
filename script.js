@@ -1,11 +1,13 @@
 const calc = document.getElementById("calc");
 const seq = document.getElementById("seq");
 const result = document.getElementById("result");
+const btRadian = document.getElementById("radian");
 
 let expr = "";
 let decimal = false;
 let par = 0; //0 = left, 1 = right
 let openPar = 0;
+let radian = false;
 
 function btClick(ev) {
     const el = ev.target;
@@ -13,22 +15,46 @@ function btClick(ev) {
         return;
     let type = el.getAttribute("data-type");
     let l = expr.length;
-    let last = (l > 0) ? expr.trim()[l - 1] : null;
+    let last = (l > 0) ? expr[l - 1] : null;
     switch (type) {
+        case "a":
+            if (el.getAttribute("data-value") == "l")
+                seq.scrollBy(-40,0);
+            else
+                seq.scrollBy(40,0);
+            return;
         case "b":
-            expr = expr.slice(0,expr.length - 1);
+            l--;
+            if (last == ".")
+                decimal = false;
+            else if (last == ")")
+                openPar++;
+            else if ((last == "(") || /[a-z]/.test(last)) {
+                if (last == "(")
+                    openPar --;
+                while ((l > 0) && (/[a-z]/.test(expr[l - 1])))
+                    l--;
+            }
+            expr = expr.slice(0,l).trim();
             break;
         case "c":
+            if (seq.textContent == "0")
+                result.textContent = "0";
+            else
+                seq.textContent = "0";
             expr = "";
-            seq.textContent = "0";
-            result.textContent = "0";
+            decimal = false;
+            par = 0;
+            openPar = 0;
             return;
         case "d":
             if (!decimal) {
                 if (/[ei)]/.test(last))
                     return;
-                else if (!last || /[(+\-*/d]/.test(last))
+                else if (!last || (last == "("))
                     expr += "0.";
+                else if (/[+\-*/d]/.test(last))
+                    expr += " 0.";
                 else
                     expr += ".";
                 decimal = true;
@@ -37,6 +63,9 @@ function btClick(ev) {
         case "e":
             result.textContent = parse(0);
             expr = "";
+            decimal = false;
+            par = 0;
+            openPar = 0;
             return;
         case "h":
             //to do
@@ -45,6 +74,8 @@ function btClick(ev) {
             if (/[ei)]/.test(last))
                 return;
             par = 1;
+            if (/[+\-*/d]/.test(last))
+                expr += " ";
             expr += el.getAttribute("data-value");
             break;
         case "o":
@@ -52,15 +83,19 @@ function btClick(ev) {
                 return;
             decimal = false;
             par = 0;
-            expr += " " + el.getAttribute("data-value") + " ";
+            if (expr == "")
+                expr += "0";
+            expr += " " + el.getAttribute("data-value");
             break;
         case "u":
         case "t":
             if (/[0-9ei.)]/.test(last))
-                    return;
+                return;
             decimal = false;
             par = 0;
             openPar++;
+            if (/[+\-*/d]/.test(last))
+                expr += " ";
             expr += el.getAttribute("data-value");
             break;
         case "p":
@@ -79,7 +114,8 @@ function btClick(ev) {
             }
             break;
         case "r":
-            //to do
+            btRadian.classList.toggle("radian-on");
+            radian = !radian;
             break;
         case "s":
             //to do
@@ -101,7 +137,7 @@ function parse(expr) {
     if (expr == "0")
         return 1;
     else 
-        return 0;
+        return 2;
 }
 
 //Freeze the size of the components

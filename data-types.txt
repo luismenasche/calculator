@@ -1,3 +1,4 @@
+a = arrow
 b = backspace
 c = clear
 d = decimal point

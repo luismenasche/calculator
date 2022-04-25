@@ -39,7 +39,7 @@
 
 .seq {
     font-size: 2rem;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     overflow: hidden;
     user-select: none;
     white-space: nowrap;
@@ -70,20 +70,15 @@
     grid-row: span 2;
 }
 
-.button[data-type="b"], .button[data-type="c"],
-.button[data-type="h"], .button[data-type="p"], 
-.button[data-type="r"] {
+.button[data-type="a"], .button[data-type="b"], 
+.button[data-type="c"], .button[data-type="h"], 
+.button[data-type="p"], .button[data-type="r"] {
     background-color: hsl(180,70%,40%);
-}
-
-.button[data-type="h"] {
-    grid-column: span 2;
 }
 
 .button[data-type="b"] {
     font-size: 1.1rem;
     line-height: 1;
-    grid-column: var(--cols-num);
 }
 
 .button[data-type="t"] {
@@ -97,6 +92,11 @@
 
 .smaller {
     font-size: 0.8rem;
+}
+
+.button.radian-on {
+    background-color: hsl(180,90%,25%);
+    color: white;
 }
 
 .button:hover {
