@@ -1,7 +1,8 @@
-const calc = document.getElementById("calc");
 const seq = document.getElementById("seq");
 const result = document.getElementById("result");
+const keybd = document.getElementById("keyboard");
 const btRadian = document.getElementById("radian");
+const history = document.getElementById("history");
 
 let expr = "";
 let decimal = false;
@@ -61,14 +62,26 @@ function btClick(ev) {
             }
             break;
         case "e":
-            result.textContent = parse(0);
+            let histItem = document.createElement("li");
+            let firstPart = document.createElement("span");
+            let secondPart = document.createElement("span");
+            let res = parse(0);
+            histItem.classList.add("history__item");
+            histItem.setAttribute("tabindex","0");
+            firstPart.textContent = String(expr);
+            secondPart.classList.add("history__highlight");
+            secondPart.textContent = ` = ${res}`;
+            histItem.appendChild(firstPart);
+            histItem.appendChild(secondPart);
+            history.insertBefore(histItem, history.lastElementChild);
+            result.textContent = res;
             expr = "";
             decimal = false;
             par = 0;
             openPar = 0;
             return;
         case "h":
-            //to do
+            history.classList.add("history--on");
             break;
         case "n":
             if (/[ei)]/.test(last))
@@ -143,5 +156,12 @@ function parse(expr) {
 //Freeze the size of the components
 seq.style.width = `${seq.offsetWidth}px`;
 result.style.width = `${result.offsetWidth}px`;
+keybd.style.height = `${keybd.offsetHeight}px`;
+keybd.style.width = `${keybd.offsetWidth}px`;
+history.style.height = `${keybd.offsetHeight}px`;
+history.style.width = `${keybd.offsetWidth}px`;
 
-calc.addEventListener("click", btClick);
+keybd.addEventListener("click", btClick);
+history.lastElementChild.addEventListener("click", () => {
+    history.classList.remove("history--on")
+});

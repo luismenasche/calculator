@@ -11,154 +11,159 @@
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
-<body>
+<body class="page">
   <main class="main">
-    <section class="calculator" id="calc">
+    <section class="calculator">
       <div class="display">
         <p class="seq" id="seq">0</p>
         <p class="result" id="result">0</p>
       </div>
-      <button type="button" class="button" data-type="h" data-value="h">
-        Hist
-      </button>
-      <button type="button" class="button" id="radian" data-type="r" data-value="r">
-        Rad
-      </button>
-      <button type="button" class="button" data-type="a" data-value="l">
-        &#x27EA;
-      </button>
-      <button type="button" class="button" data-type="a" data-value="r">
-        &#x27EB;
-      </button>
-      <button type="button" class="button" data-type="p" data-value="()">
-        ()
-      </button>
-      <button type="button" class="button" data-type="b" data-value="b">
-        &#x232B;
-      </button>
-      <button type="button" class="button" data-type="u" data-value="1/(">
-        1/x
-      </button>
-      <button type="button" class="button" data-type="u" data-value="sqrt(">
-        &#x221A;
-      </button>
-      <button type="button" class="button" data-type="%" data-value="%">
-        %
-      </button>
-      <button type="button" class="button" data-type="o" data-value="mod">
-        mod
-      </button>
-      <button type="button" class="button" data-type="o" data-value="/">
-        /
-      </button>
-      <button type="button" class="button" data-type="o" data-value="*">
-        *
-      </button>
-      <button type="button" class="button" data-type="u" data-value="abs(">
-        |x|
-      </button>
-      <button type="button" class="button" data-type="u" data-value="fact(">
-        x!
-      </button>
-      <button type="button" class="button" data-type="n" data-value="7">
-        7
-      </button>
-      <button type="button" class="button" data-type="n" data-value="8">
-        8
-      </button>
-      <button type="button" class="button" data-type="n" data-value="9">
-        9
-      </button>
-      <button type="button" class="button" data-type="o" data-value="-">
-        -
-      </button>
-      <button type="button" class="button" data-type="o" data-value="^">
-        x<sup>y</sup>
-      </button>
-      <button type="button" class="button" data-type="n" data-value="pi">
-        &pi;
-      </button>
-      <button type="button" class="button" data-type="n" data-value="4">
-        4
-      </button>
-      <button type="button" class="button" data-type="n" data-value="5">
-        5
-      </button>
-      <button type="button" class="button" data-type="n" data-value="6">
-        6
-      </button>
-      <button type="button" class="button" data-type="o" data-value="+">
-        +
-      </button>
-      <button type="button" class="button" data-type="u" data-value="log(">
-        log
-      </button>
-      <button type="button" class="button" data-type="n" data-value="e">
-        e
-      </button>
-      <button type="button" class="button" data-type="n" data-value="1">
-        1
-      </button>
-      <button type="button" class="button" data-type="n" data-value="2">
-        2
-      </button>
-      <button type="button" class="button" data-type="n" data-value="3">
-        3
-      </button>
-      <button type="button" class="button" data-type="e" data-value="=">
-        =
-      </button>
-      <button type="button" class="button" data-type="u" data-value="ln(">
-        ln
-      </button>
-      <button type="button" class="button" data-type="s" data-value="+/-">
-        +/-
-      </button>
-      <button type="button" class="button" data-type="c" data-value="c">
-        C
-      </button>
-      <button type="button" class="button" data-type="n" data-value="0">
-        0
-      </button>
-      <button type="button" class="button" data-type="d" data-value=".">
-        .
-      </button>
-      <button type="button" class="button" data-type="t" data-value="sin(">
-        sin
-      </button>
-      <button type="button" class="button" data-type="t" data-value="cos(">
-        cos
-      </button>
-      <button type="button" class="button" data-type="t" data-value="tan(">
-        tan
-      </button>
-      <button type="button" class="button small" data-type="t" data-value="asin(">
-        asin
-      </button>
-      <button type="button" class="button small" data-type="t" data-value="acos(">
-        acos
-      </button>
-      <button type="button" class="button small" data-type="t" data-value="atan(">
-        atan
-      </button>
-      <button type="button" class="button small" data-type="t" data-value="sinh(">
-        sinh
-      </button>
-      <button type="button" class="button small" data-type="t" data-value="cosh(">
-        cosh
-      </button>
-      <button type="button" class="button small" data-type="t" data-value="tanh(">
-        tanh
-      </button>
-      <button type="button" class="button smaller" data-type="t" data-value="asinh(">
-        asinh
-      </button>
-      <button type="button" class="button smaller" data-type="t" data-value="acosh(">
-        acosh
-      </button>
-      <button type="button" class="button smaller" data-type="t" data-value="atanh(">
-        atanh
-      </button>
+      <div class="keyboard" id="keyboard">
+        <button type="button" class="button" data-type="h" data-value="h">
+          Hist
+        </button>
+        <button type="button" class="button" id="radian" data-type="r" data-value="r">
+          Rad
+        </button>
+        <button type="button" class="button" data-type="a" data-value="l">
+          &#x27EA;
+        </button>
+        <button type="button" class="button" data-type="a" data-value="r">
+          &#x27EB;
+        </button>
+        <button type="button" class="button" data-type="p" data-value="()">
+          ()
+        </button>
+        <button type="button" class="button" data-type="b" data-value="b">
+          &#x232B;
+        </button>
+        <button type="button" class="button" data-type="u" data-value="1/(">
+          1/x
+        </button>
+        <button type="button" class="button" data-type="u" data-value="sqrt(">
+          &#x221A;
+        </button>
+        <button type="button" class="button" data-type="%" data-value="%">
+          %
+        </button>
+        <button type="button" class="button" data-type="o" data-value="mod">
+          mod
+        </button>
+        <button type="button" class="button" data-type="o" data-value="/">
+          /
+        </button>
+        <button type="button" class="button" data-type="o" data-value="*">
+          *
+        </button>
+        <button type="button" class="button" data-type="u" data-value="abs(">
+          |x|
+        </button>
+        <button type="button" class="button" data-type="u" data-value="fact(">
+          x!
+        </button>
+        <button type="button" class="button" data-type="n" data-value="7">
+          7
+        </button>
+        <button type="button" class="button" data-type="n" data-value="8">
+          8
+        </button>
+        <button type="button" class="button" data-type="n" data-value="9">
+          9
+        </button>
+        <button type="button" class="button" data-type="o" data-value="-">
+          -
+        </button>
+        <button type="button" class="button" data-type="o" data-value="^">
+          x<sup>y</sup>
+        </button>
+        <button type="button" class="button" data-type="n" data-value="pi">
+          &pi;
+        </button>
+        <button type="button" class="button" data-type="n" data-value="4">
+          4
+        </button>
+        <button type="button" class="button" data-type="n" data-value="5">
+          5
+        </button>
+        <button type="button" class="button" data-type="n" data-value="6">
+          6
+        </button>
+        <button type="button" class="button" data-type="o" data-value="+">
+          +
+        </button>
+        <button type="button" class="button" data-type="u" data-value="log(">
+          log
+        </button>
+        <button type="button" class="button" data-type="n" data-value="e">
+          e
+        </button>
+        <button type="button" class="button" data-type="n" data-value="1">
+          1
+        </button>
+        <button type="button" class="button" data-type="n" data-value="2">
+          2
+        </button>
+        <button type="button" class="button" data-type="n" data-value="3">
+          3
+        </button>
+        <button type="button" class="button" data-type="e" data-value="=">
+          =
+        </button>
+        <button type="button" class="button" data-type="u" data-value="ln(">
+          ln
+        </button>
+        <button type="button" class="button" data-type="s" data-value="+/-">
+          +/-
+        </button>
+        <button type="button" class="button" data-type="c" data-value="c">
+          C
+        </button>
+        <button type="button" class="button" data-type="n" data-value="0">
+          0
+        </button>
+        <button type="button" class="button" data-type="d" data-value=".">
+          .
+        </button>
+        <button type="button" class="button" data-type="t" data-value="sin(">
+          sin
+        </button>
+        <button type="button" class="button" data-type="t" data-value="cos(">
+          cos
+        </button>
+        <button type="button" class="button" data-type="t" data-value="tan(">
+          tan
+        </button>
+        <button type="button" class="button small" data-type="t" data-value="asin(">
+          asin
+        </button>
+        <button type="button" class="button small" data-type="t" data-value="acos(">
+          acos
+        </button>
+        <button type="button" class="button small" data-type="t" data-value="atan(">
+          atan
+        </button>
+        <button type="button" class="button small" data-type="t" data-value="sinh(">
+          sinh
+        </button>
+        <button type="button" class="button small" data-type="t" data-value="cosh(">
+          cosh
+        </button>
+        <button type="button" class="button small" data-type="t" data-value="tanh(">
+          tanh
+        </button>
+        <button type="button" class="button smaller" data-type="t" data-value="asinh(">
+          asinh
+        </button>
+        <button type="button" class="button smaller" data-type="t" data-value="acosh(">
+          acosh
+        </button>
+        <button type="button" class="button smaller" data-type="t" data-value="atanh(">
+          atanh
+        </button>
+      </div>
+      <ul class="history" id="history">
+        <li class="history__item" tabindex="0">Back</li>
+      </ul> 
     </section>
   </main>
   <footer>
