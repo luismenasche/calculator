@@ -128,15 +128,15 @@
 }
 
 .history__item {
-    border-bottom: 2px solid gray;
+    border-top: 2px solid gray;
     cursor: default;
     font-size: 1.1rem;
     padding: 5px;
     user-select: none;
 }
 
-.history__item:last-child {
-    border-bottom: 0;
+.history__item:first-child {
+    border-top: 0;
     color: blue;
     text-align: center;
     text-decoration: underline;
