@@ -6,7 +6,6 @@ const hist = document.getElementById("history");
 
 let expr = "";
 let decimal = false;
-let par = 0; //0 = left, 1 = right
 let openPar = 0;
 let radian = false;
 let histLength = 0;
@@ -48,7 +47,6 @@ function btClick(ev) {
                 seq.textContent = "0";
             expr = "";
             decimal = false;
-            par = 0;
             openPar = 0;
             return;
         case "d":
@@ -69,7 +67,6 @@ function btClick(ev) {
             updateHistory(expr, result.textContent);
             expr = "";
             decimal = false;
-            par = 0;
             openPar = 0;
             return;
         case "h":
@@ -80,7 +77,6 @@ function btClick(ev) {
                 return;
             if ((/[0-9]/.test(last)) && (/[ep]/.test(value[0])))
                 return;
-            par = 1;
             if (/[+\-*/d]/.test(last))
                 expr += " ";
             expr += value;
@@ -89,7 +85,6 @@ function btClick(ev) {
             if (/[(.+\-*/d]/.test(last))
                 return;
             decimal = false;
-            par = 0;
             if (expr == "")
                 expr += "0";
             expr += " " + value;
@@ -99,15 +94,18 @@ function btClick(ev) {
             if (/[0-9ei.)]/.test(last))
                 return;
             decimal = false;
-            par = 0;
             openPar++;
             if (/[+\-*/d]/.test(last))
                 expr += " ";
             expr += value;
             break;
         case "p":
-            if (!par) {
+            if ((expr == "") || (last == "(")) {
                 expr += "(";
+                openPar++;
+            }
+            else if (/[+\-*/d^]/.test(last)) {
+                expr += " (";
                 openPar++;
             }
             else if (openPar > 0) {
@@ -115,7 +113,6 @@ function btClick(ev) {
                 openPar--;
             }
             else {
-                par = 0;
                 openPar = 1;
                 expr += " * (";
             }
@@ -175,20 +172,26 @@ function updateHistory(first, second, newItem = true) {
         histArray.push([first, second]);
 }
 
-//Setup history
-histArray = JSON.parse(localStorage.getItem("history")) ?? [];
-for (let i of histArray)
-    updateHistory(i[0], i[1], false);
-
 //Events
 
+//Load history
+window.addEventListener("load", () => {
+    histArray = JSON.parse(localStorage.getItem("history")) ?? [];
+    for (let i of histArray)
+        updateHistory(i[0], i[1], false);
+});
+//Save history
+window.addEventListener("beforeunload", () => {
+    localStorage.setItem("history", JSON.stringify(histArray));
+});
+//Keyboard buttons
 keybd.addEventListener("click", btClick);
-//Back
+//History -> Back
 hist.children[0].children[0].addEventListener("click", ev => {
     hist.classList.remove("history--on");
     ev.stopPropagation();
 });
-//Clear
+//History -> Clear
 hist.children[0].children[1].addEventListener("click", ev => {
     localStorage.removeItem("history");
     histArray = [];
@@ -196,6 +199,7 @@ hist.children[0].children[1].addEventListener("click", ev => {
     hist.replaceChildren(hist.children[0]);
     ev.stopPropagation();
 });
+//History -> Retrieve
 hist.addEventListener("dblclick", ev => {
     const el = ev.target;
     const num = el.children[1].textContent.slice(3);
@@ -203,25 +207,22 @@ hist.addEventListener("dblclick", ev => {
     const last = (l > 0) ? expr[l - 1] : null;
     if (/[ei)]/.test(last))
         return;
-    par = 1;
     if (/[+\-*/d]/.test(last))
         expr += " ";
     expr += num;
     seq.textContent = expr;
     hist.classList.remove("history--on");
 });
+//History -> Delete
 hist.addEventListener("click", ev => {
     const el = ev.target;
     const item = Number(el.getAttribute("data-li")) - 1;
     if (!el.classList.contains("trash"))
         return;
     histArray.splice(item, 1);
-    //Rebuilds history
+    //Rebuild history
     histLength = 0;
     hist.replaceChildren(hist.children[0]); 
     for (let i of histArray)
         updateHistory(i[0], i[1], false);
-});
-window.addEventListener("beforeunload", () => {
-    localStorage.setItem("history", JSON.stringify(histArray));
 });
