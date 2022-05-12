@@ -19,9 +19,10 @@ function btClick(ev) {
     const type = el.getAttribute("data-type");
     let l = expr.length;
     const last = (l > 0) ? expr[l - 1] : null;
+    let value = el.getAttribute("data-value");
     switch (type) {
         case "a":
-            if (el.getAttribute("data-value") == "l")
+            if (value == "l")
                 seq.scrollBy(-40,0);
             else
                 seq.scrollBy(40,0);
@@ -77,10 +78,12 @@ function btClick(ev) {
         case "n":
             if (/[ei)]/.test(last))
                 return;
+            if ((/[0-9]/.test(last)) && (/[ep]/.test(value[0])))
+                return;
             par = 1;
             if (/[+\-*/d]/.test(last))
                 expr += " ";
-            expr += el.getAttribute("data-value");
+            expr += value;
             break;
         case "o":
             if (/[(.+\-*/d]/.test(last))
@@ -89,7 +92,7 @@ function btClick(ev) {
             par = 0;
             if (expr == "")
                 expr += "0";
-            expr += " " + el.getAttribute("data-value");
+            expr += " " + value;
             break;
         case "u":
         case "t":
@@ -100,7 +103,7 @@ function btClick(ev) {
             openPar++;
             if (/[+\-*/d]/.test(last))
                 expr += " ";
-            expr += el.getAttribute("data-value");
+            expr += value;
             break;
         case "p":
             if (!par) {
