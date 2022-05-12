@@ -148,6 +148,7 @@ function updateHistory(first, second, newItem = true) {
     const histItem = document.createElement("li");
     const firstPart = document.createElement("span");
     const secondPart = document.createElement("span");
+    const thirdPart = document.createElement("span");
     histItem.classList.add("history__item");
     histItem.setAttribute("tabindex","0");
     histLength++;
@@ -156,22 +157,48 @@ function updateHistory(first, second, newItem = true) {
         hist.removeChild(hist.lastElementChild);
     }
     firstPart.textContent = `${histLength}. ${first}`;
-    secondPart.classList.add("history__highlight");
     secondPart.textContent = ` = ${second}`;
+    thirdPart.textContent = "\u{1F5D1}";
+    firstPart.classList.add("no-pointer");
+    secondPart.classList.add("no-pointer");
+    secondPart.classList.add("history__highlight");
+    thirdPart.classList.add("trash");
+    thirdPart.setAttribute("data-li", String(histLength));
     histItem.appendChild(firstPart);
     histItem.appendChild(secondPart);
-    histItem.addEventListener("dblclick", histRecover);
-    hist.firstElementChild.insertAdjacentElement("afterend",histItem);
+    histItem.appendChild(thirdPart);
+    hist.children[0].insertAdjacentElement("afterend",histItem);
     if (newItem)
         histArray.push([first, second]);
 }
 
-function histRecover(ev) {
-    const el = ev.currentTarget;
-    const num = el.lastElementChild.textContent.slice(3);
+//Setup history
+histArray = JSON.parse(localStorage.getItem("history")) ?? [];
+for (let i of histArray)
+    updateHistory(i[0], i[1], false);
+
+//Events
+
+keybd.addEventListener("click", btClick);
+//Back
+hist.children[0].children[0].addEventListener("click", ev => {
+    hist.classList.remove("history--on");
+    ev.stopPropagation();
+});
+//Clear
+hist.children[0].children[1].addEventListener("click", ev => {
+    localStorage.removeItem("history");
+    histArray = [];
+    histLength = 0;
+    hist.replaceChildren(hist.children[0]);
+    ev.stopPropagation();
+});
+hist.addEventListener("dblclick", ev => {
+    const el = ev.target;
+    const num = el.children[1].textContent.slice(3);
     const l = expr.length;
     const last = (l > 0) ? expr[l - 1] : null;
-    if (/[ei0-9.)]/.test(last))
+    if (/[ei)]/.test(last))
         return;
     par = 1;
     if (/[+\-*/d]/.test(last))
@@ -179,24 +206,18 @@ function histRecover(ev) {
     expr += num;
     seq.textContent = expr;
     hist.classList.remove("history--on");
-}
-
-//Freeze the size of the components
-seq.style.width = `${seq.offsetWidth}px`;
-result.style.width = `${result.offsetWidth}px`;
-keybd.style.height = `${keybd.offsetHeight}px`;
-keybd.style.width = `${keybd.offsetWidth}px`;
-hist.style.height = `${keybd.offsetHeight}px`;
-hist.style.width = `${keybd.offsetWidth}px`;
-
-histArray = JSON.parse(localStorage.getItem("history")) ?? [];
-//Load history
-for (let i of histArray)
-    updateHistory(i[0], i[1], false);
-
-keybd.addEventListener("click", btClick);
-hist.firstElementChild.addEventListener("click", () => {
-    hist.classList.remove("history--on");
+});
+hist.addEventListener("click", ev => {
+    const el = ev.target;
+    const item = Number(el.getAttribute("data-li")) - 1;
+    if (!el.classList.contains("trash"))
+        return;
+    histArray.splice(item, 1);
+    //Rebuilds history
+    histLength = 0;
+    hist.replaceChildren(hist.children[0]); 
+    for (let i of histArray)
+        updateHistory(i[0], i[1], false);
 });
 window.addEventListener("beforeunload", () => {
     localStorage.setItem("history", JSON.stringify(histArray));

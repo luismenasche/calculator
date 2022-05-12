@@ -23,8 +23,9 @@
 
 .calculator {
     background-color: hsl(0,0%,85%);
+    height: 500px;
     padding: 10px;
-    position: relative;
+    width: 400px;
 }
 
 .display {
@@ -32,7 +33,6 @@
     color: white;
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
-    grid-column: span var(--cols-num);
     line-height: 1;
     padding-right: 5px;
     text-align: right;
@@ -58,6 +58,7 @@
     gap: 10px;
     grid-template-columns: repeat(var(--cols-num),1fr);
     margin-top: 10px;
+    position: relative;
 }
 
 .button {
@@ -114,12 +115,14 @@
 
 .history {
     background-color: white;
-    bottom: 10px;
     display: none;
-    left: 10px;
+    height: 100%;
+    left: 0;
     list-style-type: none;
     overflow-y: auto;
     position: absolute;
+    top: 0;
+    width: 100%;
     z-index: 1;
 }
 
@@ -137,8 +140,9 @@
 
 .history__item:first-child {
     border-top: 0;
+    display: flex;
     color: blue;
-    text-align: center;
+    justify-content: space-around;
     text-decoration: underline;
 }
 
@@ -149,6 +153,14 @@
 .history__highlight {
     color: blue;
     font-weight: bold;
+}
+
+.no-pointer {
+    pointer-events: none;
+}
+
+.trash {
+    float: right;
 }
 
 .author {
@@ -163,6 +175,11 @@
 
     .calculator, .button {
         padding: 5px;
+    }
+
+    .calculator {
+        height: 330px;
+        width: 270px;
     }
 
     .keyboard {
@@ -183,6 +200,11 @@
 
     .calculator, .button {
         padding: 3px;
+    }
+
+    .calculator {
+        height: 275px;
+        width: 230px;
     }
 
     .keyboard {
