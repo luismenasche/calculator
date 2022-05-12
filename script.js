@@ -122,7 +122,20 @@ function btClick(ev) {
             radian = !radian;
             break;
         case "s":
-            //to do
+            if (expr == "")
+                expr = "-";
+            else if (last == "+") {
+                let arr = expr.split("");
+                arr.splice(l - 1, 1, "-");
+                expr = arr.join("");
+            }
+            else if (last == "-") {
+                let arr = expr.split("");
+                arr.splice(l - 1, 1, "+");
+                expr = arr.join("");
+                if (expr == "+")
+                    expr = "";
+            }
             break;
         case "%":
             //to do

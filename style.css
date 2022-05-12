@@ -134,6 +134,7 @@
     border-top: 2px solid gray;
     cursor: default;
     font-size: 1.1rem;
+    margin-top: 2px;
     padding: 5px;
     user-select: none;
 }
@@ -143,6 +144,7 @@
     display: flex;
     color: blue;
     justify-content: space-around;
+    margin-top: 0;
     text-decoration: underline;
 }
 
@@ -161,6 +163,12 @@
 
 .trash {
     float: right;
+    padding: 2px;
+}
+
+.trash:hover {
+    background-color: hsl(0,100%,80%);
+    box-shadow: 0 0 4px 1px black;
 }
 
 .author {
