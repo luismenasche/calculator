@@ -110,7 +110,7 @@
 }
 
 .button:hover {
-    outline: 2px dotted black;
+    box-shadow: 0 0 4px 1px black;
 }
 
 .history {

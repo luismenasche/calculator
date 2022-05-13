@@ -122,19 +122,29 @@ function btClick(ev) {
             radian = !radian;
             break;
         case "s":
-            if (expr == "")
-                expr = "-";
-            else if (last == "+") {
-                let arr = expr.split("");
-                arr.splice(l - 1, 1, "-");
-                expr = arr.join("");
+            while ((l > 0) && (/[0-9pie.\s]/.test(expr[l - 1])))
+                l--;
+            if (l == 0) {
+                expr = "-" + expr;
+                break;
             }
-            else if (last == "-") {
-                let arr = expr.split("");
-                arr.splice(l - 1, 1, "+");
-                expr = arr.join("");
-                if (expr == "+")
-                    expr = "";
+            l--;
+            switch (expr[l]) {
+                case "(":
+                    expr = expr.slice(0,l+1) + "-" + expr.slice(l+1);
+                    break;
+                case "+":
+                    expr = expr.slice(0,l) + "-" + expr.slice(l+1);
+                    break;
+                case "-":
+                    if (last == "-")
+                        expr = expr.slice(0,l) + expr.slice(l+1);
+                    else    
+                        expr = expr.slice(0,l) + "+" + expr.slice(l+1);
+                    break;
+                default:
+                    expr = expr.slice(0,l+2) + " -" + expr.slice(l+2);
+                    break;
             }
             break;
         case "%":
