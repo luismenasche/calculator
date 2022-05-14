@@ -17,6 +17,8 @@ function btClick(ev) {
         return;
     const type = el.getAttribute("data-type");
     let l = expr.length;
+    if (expr[l - 1] == " ")
+        l--;
     const last = (l > 0) ? expr[l - 1] : null;
     let value = el.getAttribute("data-value");
     switch (type) {
@@ -27,6 +29,8 @@ function btClick(ev) {
                 seq.scrollBy(40,0);
             return;
         case "b":
+            if (expr[l - 1] == " ")
+                l--;
             l--;
             if (last == ".")
                 decimal = false;
@@ -38,7 +42,7 @@ function btClick(ev) {
                 while ((l > 0) && (/[a-z]/.test(expr[l - 1])))
                     l--;
             }
-            expr = expr.slice(0,l).trim();
+            expr = expr.slice(0,l);
             break;
         case "c":
             if (seq.textContent == "0")
@@ -77,8 +81,6 @@ function btClick(ev) {
                 return;
             if ((/[0-9]/.test(last)) && (/[ep]/.test(value[0])))
                 return;
-            if (/[+\-*/d]/.test(last))
-                expr += " ";
             expr += value;
             break;
         case "o":
@@ -87,7 +89,7 @@ function btClick(ev) {
             decimal = false;
             if (expr == "")
                 expr += "0";
-            expr += " " + value;
+            expr += " " + value + " ";
             break;
         case "u":
         case "t":
@@ -95,8 +97,6 @@ function btClick(ev) {
                 return;
             decimal = false;
             openPar++;
-            if (/[+\-*/d]/.test(last))
-                expr += " ";
             expr += value;
             break;
         case "p":
@@ -137,13 +137,13 @@ function btClick(ev) {
                     expr = expr.slice(0,l) + "-" + expr.slice(l+1);
                     break;
                 case "-":
-                    if (last == "-")
-                        expr = expr.slice(0,l) + expr.slice(l+1);
-                    else    
+                    if (expr[l + 1] == " ") //binary -
                         expr = expr.slice(0,l) + "+" + expr.slice(l+1);
+                    else //unary -    
+                        expr = expr.slice(0,l) + expr.slice(l+1);
                     break;
                 default:
-                    expr = expr.slice(0,l+2) + " -" + expr.slice(l+2);
+                    expr = expr.slice(0,l+2) + "-" + expr.slice(l+2);
                     break;
             }
             break;
@@ -154,7 +154,7 @@ function btClick(ev) {
     if (expr == "")
         seq.textContent = "0";
     else
-        seq.textContent = expr;
+        seq.textContent = expr.trimEnd();
     seq.scrollTo(seq.scrollWidth,0);
     result.textContent = String(parse(expr));
     result.scrollTo(result.scrollWidth,0);
@@ -230,8 +230,6 @@ hist.addEventListener("dblclick", ev => {
     const last = (l > 0) ? expr[l - 1] : null;
     if (/[ei)]/.test(last))
         return;
-    if (/[+\-*/d]/.test(last))
-        expr += " ";
     expr += num;
     seq.textContent = expr;
     hist.classList.remove("history--on");
