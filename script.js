@@ -55,11 +55,11 @@ function btClick(ev) {
             return;
         case "d":
             if (!decimal) {
-                if (/[ei)]/.test(last))
+                if (/[ei)%]/.test(last))
                     return;
                 else if (!last || (last == "("))
                     expr += "0.";
-                else if (/[+\-*/d]/.test(last))
+                else if (/[+\-*/d^]/.test(last))
                     expr += " 0.";
                 else
                     expr += ".";
@@ -77,14 +77,14 @@ function btClick(ev) {
             hist.classList.add("history--on");
             break;
         case "n":
-            if (/[ei)]/.test(last))
+            if (/[ei)%]/.test(last))
                 return;
             if ((/[0-9]/.test(last)) && (/[ep]/.test(value[0])))
                 return;
             expr += value;
             break;
         case "o":
-            if (/[(.+\-*/d]/.test(last))
+            if (/[(.+\-*/d^]/.test(last))
                 return;
             decimal = false;
             if (expr == "")
@@ -93,7 +93,7 @@ function btClick(ev) {
             break;
         case "u":
         case "t":
-            if (/[0-9ei.)]/.test(last))
+            if (/[0-9ei.)%]/.test(last))
                 return;
             decimal = false;
             openPar++;
@@ -122,7 +122,7 @@ function btClick(ev) {
             radian = !radian;
             break;
         case "s":
-            while ((l > 0) && (/[0-9pie.\s]/.test(expr[l - 1])))
+            while ((l > 0) && (/[0-9pie.%\s]/.test(expr[l - 1])))
                 l--;
             if (l == 0) {
                 expr = "-" + expr;
@@ -148,7 +148,10 @@ function btClick(ev) {
             }
             break;
         case "%":
-            //to do
+            if (/[.+\-*/d(^%]/.test(last))
+                return;
+            decimal = false
+            expr += value;
             break;
     }
     if (expr == "")
