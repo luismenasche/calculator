@@ -69,9 +69,13 @@
     padding: 10px;
 }
 
-.button[data-type="o"], .button[data-type="u"], 
-.button[data-type="s"], .button[data-type="%"] {
+.button[data-type="o"] {
     background-color: hsl(0,50%,45%);
+}
+
+.button[data-type="u"], .button[data-type="s"], 
+.button[data-type="%"] {
+    background-color: hsl(330,50%,50%);
 }
 
 .button[data-type="e"] {
