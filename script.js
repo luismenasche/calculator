@@ -84,12 +84,19 @@ function btClick(ev) {
             expr += value;
             break;
         case "o":
-            if (/[(.+\-*/d^]/.test(last))
+            if (/[(.]/.test(last))
                 return;
+            if (/[+\-*/d^]/.test(last)) {
+                while (expr[l - 1] != " ")
+                    l--;
+                expr = expr.slice(0,l) + value + " ";
+            }
+            else {
+                if (expr == "")
+                    expr += "0";
+                expr += " " + value + " ";
+            }
             decimal = false;
-            if (expr == "")
-                expr += "0";
-            expr += " " + value + " ";
             break;
         case "u":
         case "t":
