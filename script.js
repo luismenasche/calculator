@@ -122,7 +122,7 @@ function btClick(ev) {
             radian = !radian;
             break;
         case "s":
-            while ((l > 0) && (/[0-9pie.%\s]/.test(expr[l - 1])))
+            while ((l > 0) && (/[0-9pie.%\s)]/.test(expr[l - 1])))
                 l--;
             if (l == 0) {
                 expr = "-" + expr;
