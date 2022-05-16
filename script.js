@@ -32,8 +32,14 @@ function btClick(ev) {
             if (expr[l - 1] == " ")
                 l--;
             l--;
-            if (last == ".")
+            if (last == ".") {
+                let laux = l;
                 decimal = false;
+                while ((laux > 0) && (expr[laux - 1] == "0"))
+                    laux--;
+                if (!/[1-9]/.test(expr[laux - 1]))
+                    l = laux;
+            }
             else if (last == ")")
                 openPar++;
             else if ((last == "(") || /[a-z]/.test(last)) {
@@ -45,10 +51,8 @@ function btClick(ev) {
             expr = expr.slice(0,l);
             break;
         case "c":
-            if (seq.textContent == "0")
-                result.textContent = "0";
-            else
-                seq.textContent = "0";
+            seq.textContent = "0";
+            result.textContent = "0";
             expr = "";
             decimal = false;
             openPar = 0;
@@ -57,17 +61,17 @@ function btClick(ev) {
             if (!decimal) {
                 if (/[ei)%]/.test(last))
                     return;
-                else if (!last || (last == "("))
+                else if (!last || (last == "(") || (/[+\-*/d^]/.test(last)))
                     expr += "0.";
-                else if (/[+\-*/d^]/.test(last))
-                    expr += " 0.";
                 else
                     expr += ".";
                 decimal = true;
             }
             break;
         case "e":
-            result.textContent = parse(0);
+            if (expr == "")
+                break;
+            result.textContent = parse();
             updateHistory(expr, result.textContent);
             expr = "";
             decimal = false;
@@ -81,7 +85,12 @@ function btClick(ev) {
                 return;
             if ((/[0-9]/.test(last)) && (/[ep]/.test(value[0])))
                 return;
-            expr += value;
+            if (!/[0-9.]/.test(last) && (value == "0")) {
+                expr += "0.";
+                decimal = true;
+            }
+            else
+                expr += value;
             break;
         case "o":
             if (/[(.]/.test(last))
@@ -161,20 +170,101 @@ function btClick(ev) {
             expr += value;
             break;
     }
-    if (expr == "")
+    if (expr == "") {
         seq.textContent = "0";
-    else
+        result.textContent = "0";
+    }
+    else {
         seq.textContent = expr.trimEnd();
-    seq.scrollTo(seq.scrollWidth,0);
-    result.textContent = String(parse(expr));
-    result.scrollTo(result.scrollWidth,0);
+        result.textContent = parse();
+        seq.scrollTo(seq.scrollWidth,0);
+        result.scrollTo(result.scrollWidth,0);
+    }
 }
 
-function parse(expr) {
-    if (expr == "0")
-        return 1;
-    else 
-        return 2;
+function parse() {
+    let input = expr.slice(0);
+    function getToken() {
+        if (input == "")
+            return "";
+        let c = input[0];
+        let token;
+        if (/[0-9]/.test(c)) {
+            let l = 0;
+            do {
+                l++;
+            } while ((l < input.length) && /[0-9.]/.test(input[l]));
+            token = input.slice(0,l);
+            input = input.slice(l).trimStart();
+            return token;
+        }
+        else if (/[+\-*/^%()]/.test(c)) {
+            input = input.slice(1).trimStart();
+            return c;
+        }
+        else if (c == "m") { //mod
+            token = input.slice(0,3);
+            input = input.slice(4);
+            return token;
+        }
+        else { // "wordy" operators
+            let l = 0;
+            do {
+                l++;
+            } while ((l < input.length) && /[a-z]/.test(input[l]));
+            token = input.slice(0,l);
+            input = input.slice(l);
+            return token;
+        }
+    }
+    function E() {
+        let vt = T();
+        let vel = El();
+    }
+    function El() {
+        let op = getToken();
+        if (op == "")
+            return;
+        else {
+            let vt = T();
+            let vel = El();
+        }
+    }
+    function T() {
+        let vf = F();
+        let vtl = Tl();
+    }
+    function Tl() {
+        let op = getToken();
+        if (op == "")
+            return;
+        else {
+            let vf = F();
+            let vtl = Tl();
+        }
+    }
+    function F() {
+        let vb = B();
+        let vfl = Fl();
+    }
+    function Fl() {
+        let op = getToken();
+        if (op == "")
+            return;
+        else {
+            let vb = B();
+            let vfl = Fl();
+        }
+    }
+    function B() {
+        let token = getToken();
+
+    }
+    let token = [];
+    while (input.length > 0) {
+        token.push(getToken());
+    }
+    return token;
 }
 
 function updateHistory(first, second, newItem = true) {
