@@ -185,6 +185,7 @@ function btClick(ev) {
 function parse() {
     let input = expr.slice(0);
     function getToken() {
+        console.log(input);
         if (input == "")
             return "";
         let c = input[0];
@@ -213,58 +214,180 @@ function parse() {
                 l++;
             } while ((l < input.length) && /[a-z]/.test(input[l]));
             token = input.slice(0,l);
-            input = input.slice(l);
+            input = input.slice(l).trimStart();
             return token;
         }
     }
     function E() {
-        let vt = T();
-        let vel = El();
+        let v1, v2, op;
+        v1 = T();
+        [op, v2] = El();
+        console.log(v1,op,v2);
+        switch (op) {
+            case "+":
+                return v1 + v2;
+            case "-":
+                return v1 - v2;
+            case undefined:
+                return v1;
+            case null:
+                return null;
+        }
     }
     function El() {
-        let op = getToken();
-        if (op == "")
-            return;
-        else {
-            let vt = T();
-            let vel = El();
+        let v1, v2, op1, op2;
+        op1 = getToken();
+        if (op1 == "")
+            return [undefined, undefined];
+        v1 = T();
+        [op2, v2] = El();
+        switch (op2) {
+            case "+":
+                return [op1, v1 + v2];
+            case "-":
+                return [op1, v1 - v2];
+            case undefined:
+                return [op1, v1];
+            case null:
+                return [null, null];
         }
     }
     function T() {
-        let vf = F();
-        let vtl = Tl();
+        let v1, v2, op;
+        v1 = F();
+        [op, v2] = Tl();
+        switch (op) {
+            case "*":
+                return v1 * v2;
+            case "/":
+                return v1 / v2;
+            case "mod":
+                return (v1 >= 0) ? (v1 % v2) : (v1 % v2 + v2);
+            case undefined:
+                return v1;
+            case null:
+                return null;
+        }
     }
     function Tl() {
-        let op = getToken();
-        if (op == "")
-            return;
-        else {
-            let vf = F();
-            let vtl = Tl();
+        let v1, v2, op1, op2;
+        op1 = getToken();
+        if (op1 == "")
+            return [undefined, undefined];
+        v1 = F();
+        [op2, v2] = Tl();
+        switch (op2) {
+            case "*":
+                return [op1, v1 * v2];
+            case "/":
+                return [op1, v1 / v2];
+            case "mod":
+                return [op1, (v1 >= 0) ? (v1 % v2) : (v1 % v2 + v2)];
+            case undefined:
+                return [op1, v1];
+            case null:
+                return [null, null];
         }
     }
     function F() {
-        let vb = B();
-        let vfl = Fl();
+        let v1, v2, op;
+        v1 = B();
+        [op, v2] = Fl();
+        switch (op) {
+            case "^":
+                return v1 ** v2;
+            case undefined:
+                return v1;
+            case null:
+                return null;
+        }
     }
     function Fl() {
-        let op = getToken();
-        if (op == "")
-            return;
-        else {
-            let vb = B();
-            let vfl = Fl();
+        let v1, v2, op1, op2;
+        op1 = getToken();
+        if (op1 == "")
+            return [undefined, undefined];
+        v1 = B();
+        [op2, v2] = Fl();
+        switch (op2) {
+            case "^":
+                return [op1, v1 ** v2];
+            case undefined:
+                return [op1, v1];
+            case null:
+                return [null, null];
         }
     }
     function B() {
         let token = getToken();
-
+        console.log("B:", token);
+        let v1;
+        if (token == "")
+            return;
+        if (/[0-9]/.test(token[0]))
+            return Number(token);
+        if (token == "e")
+            return Math.E;
+        if (token == "pi")
+            return Math.PI;
+        if (/[a-z]/.test(token[0])) {
+            getToken(); // (
+            v1 = E();
+            if ((v1 == null) || (v1 == undefined))
+                return v1;
+        }
+        switch (token) {
+            case "(":
+                return E();
+            case "sqrt":
+                return Math.sqrt(v1);
+            case "fact":
+                return fact(v1);
+            case "abs":
+                return Math.abs(v1);
+            case "log":
+                return Math.log10(v1);
+            case "ln":
+                return Math.log(v1);
+            case "sin":
+                return Math.sin(v1);
+            case "sinh":
+                return Math.sinh(v1);
+            case "cos":
+                return Math.cos(v1);
+            case "cosh":
+                return Math.cosh(v1);
+            case "tan":
+                return Math.tan(v1);
+            case "tanh":
+                return Math.tanh(v1);
+            case "asin":
+                return Math.asin(v1);
+            case "asinh":
+                return Math.asinh(v1);
+            case "acos":
+                return Math.acos(v1);
+            case "acosh":
+                return Math.acosh(v1);
+            case "atan":
+                return Math.atan(v1);
+            case "atanh":
+                return Math.atanh(v1);
+        }
     }
-    let token = [];
-    while (input.length > 0) {
-        token.push(getToken());
+    function fact(n) {
+        let f = 1;
+        if (n < 0)
+            return 0;
+        for (let i = 2; i <= n; i++)
+            f *= i;
+        return f;
     }
-    return token;
+    let res = E();
+    if (!res)
+        return 0;
+    else
+        return res;
 }
 
 function updateHistory(first, second, newItem = true) {
