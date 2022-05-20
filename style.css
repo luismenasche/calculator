@@ -50,6 +50,7 @@
     font-size: 3rem;
     overflow: hidden;
     user-select: none;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 

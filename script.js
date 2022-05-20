@@ -5,7 +5,7 @@ const btRadian = document.getElementById("radian");
 const hist = document.getElementById("history");
 
 let expr = "";
-let input;
+let token = [];
 let decimal = false;
 let openPar = 0;
 let radian = false;
@@ -49,12 +49,15 @@ function btClick(ev) {
                 while ((l > 0) && (/[a-z]/.test(expr[l - 1])))
                     l--;
             }
+            if (expr[l - 1] == " ")
+                l--;
             expr = expr.slice(0,l);
             break;
         case "c":
             seq.textContent = "0";
             result.textContent = "0";
             expr = "";
+            token = [];
             decimal = false;
             openPar = 0;
             return;
@@ -75,6 +78,7 @@ function btClick(ev) {
             result.textContent = parse();
             updateHistory(expr, result.textContent);
             expr = "";
+            token = [];
             decimal = false;
             openPar = 0;
             return;
@@ -117,12 +121,8 @@ function btClick(ev) {
             expr += value;
             break;
         case "p":
-            if ((expr == "") || (last == "(")) {
+            if ((expr == "") || (last == "(") || (/[+\-*/d^]/.test(last))) {
                 expr += "(";
-                openPar++;
-            }
-            else if (/[+\-*/d^]/.test(last)) {
-                expr += " (";
                 openPar++;
             }
             else if (openPar > 0) {
@@ -177,98 +177,118 @@ function btClick(ev) {
     }
     else {
         seq.textContent = expr.trimEnd();
-        result.textContent = parse();
         seq.scrollTo(seq.scrollWidth,0);
-        result.scrollTo(result.scrollWidth,0);
+        result.textContent = parse();
     }
 }
 
 function parse() {
     console.clear();
-    input = expr.slice(0);   
+    tokenize();
     let res = E();
     if (!res)
         return 0;
     else
-        return res;
+        return String(res);
 }
 
-function getToken() {
-    console.log("Input: ", input);
-    if (input == "")
-        return "";
-    let c = input[0];
-    let token;
-    if (/[0-9]/.test(c)) {
-        let l = 0;
-        do {
-            l++;
-        } while ((l < input.length) && /[0-9.]/.test(input[l]));
-        token = input.slice(0,l);
-        input = input.slice(l).trimStart();
-        return token;
-    }
-    else if (/[+\-*/^%()]/.test(c)) {
-        input = input.slice(1).trimStart();
-        return c;
-    }
-    else if (c == "m") { //mod
-        token = input.slice(0,3);
-        input = input.slice(4);
-        return token;
-    }
-    else { // "wordy" operators
-        let l = 0;
-        do {
-            l++;
-        } while ((l < input.length) && /[a-z]/.test(input[l]));
-        token = input.slice(0,l);
-        input = input.slice(l).trimStart();
-        return token;
+function tokenize() {
+    let i = 0, c;
+    token = [];
+    while (i < expr.length) {
+        c = expr[i];
+        if (c == " ")
+            c = expr[++i];
+        if (c == undefined)
+            break;
+        if (/[0-9]/.test(c)) {
+            let l = i;
+            do {
+                l++;
+            } while ((l < expr.length) && /[0-9.]/.test(expr[l]));
+            token.push(expr.slice(i,l));
+            i = l;
+        }
+        else if (/[+\-*/^%()]/.test(c)) {
+            token.push(c);
+            i++;
+        }
+        else if (c == "m") { //mod
+            token.push(expr.slice(i,i + 3));
+            i += 3;
+        }
+        else { // "wordy" operators
+            let l = i;
+            do {
+                l++;
+            } while ((l < expr.length) && /[a-z(]/.test(expr[l]));
+            token.push(expr.slice(i,l));
+            i = l;
+        }
     }
 }
 
-function E() {
-    console.log("E");
-    let v1, v2, op;
+function E(t = false) {
+    console.log("E | ", token);
+    let v1, v2, op, res, vec = [];
+    if (t) {
+        op = token[0];
+        if (!/[+-]/.test(op))
+            return;
+        console.log("ENTREI!!!");
+        console.log("op:", op);
+        vec.push(op);
+        console.log("vec:", vec);
+        token.shift();    
+    }
     v1 = T();
-    [op, v2] = El();
-    console.log(v1,op,v2);
-    if ((op == undefined) || (v2 == undefined))
-        return v1;
-    switch (op) {
-        case "+":
-            console.log("E value: ", v1 + v2);
-            return v1 + v2;
-        case "-":
-            return v1 - v2;
+    if (v1 == undefined) {
+        vec.push("\n");
+        return vec;
     }
+    vec.push(v1);
+    v2 = E(1);
+    if (v2 != undefined)
+        vec = vec.concat(v2);
+    console.log("vec:", vec);
+    if (vec[vec.length - 1] == "")
+    res = vec[0];
+    for (let i = 1; i < vec.length; i += 2) {
+        op = vec[i];
+        switch (op) {
+            case "+":
+                res += vec[i + 1];
+                break;
+            case "-":
+                res -= vec[i + 1];
+                break;
+        }
+    }
+    return res;
 }
 
-function El() {
-    console.log("El");
-    let v1, v2, op1, op2;
-    op1 = getToken();
-    console.log("token: ", op1);
-    if (!/[+-]/.test(op1)) {
-        input = op1 + input;
-        return [undefined, undefined];
-    }
+/*function El() {
+    console.log("El | ", token);
+    let v1, v2; 
+    let op1, op2;
+    op1 = token[0];
+    if (!/[+-]/.test(op1))
+        return undefined;
+    token.shift();
     v1 = T();
     [op2, v2] = El();
     if ((op2 == undefined) || (v2 == undefined))
         return [op1, v1];
     switch (op2) {
         case "+":
-            console.log("El value: ", [op1, v1 + v2]);
             return [op1, v1 + v2];
         case "-":
             return [op1, v1 - v2];
     }
-}
+}*/
 
 function T() {
-    console.log("T");
+    console.log("T | ", token);
     let v1, v2, op;
     v1 = F();
     [op, v2] = Tl();
@@ -285,14 +305,12 @@ function T() {
 }
 
 function Tl() {
-    console.log("Tl");
+    console.log("Tl | ", token);
     let v1, v2, op1, op2;
-    op1 = getToken();
-    console.log("token: ", op1);
-    if (!/[*/]/.test(op1) && (op1 != "mod")) {
-        input = op1 + input;
+    op1 = token[0];
+    if (!/[*/]/.test(op1) && (op1 != "mod"))
         return [undefined, undefined];
-    }
+    token.shift();
     v1 = F();
     [op2, v2] = Tl();
     if ((op2 == undefined) || (v2 == undefined))
@@ -308,7 +326,7 @@ function Tl() {
 }
 
 function F() {
-    console.log("F");
+    console.log("F | ", token);
     let v1, v2, op;
     v1 = B();
     [op, v2] = Fl();
@@ -318,14 +336,12 @@ function F() {
 }
 
 function Fl() {
-    console.log("Fl");
+    console.log("Fl  | ", token);
     let v1, v2, op1, op2;
-    op1 = getToken();
-    console.log("token: ", op1);
-    if (op1 != "^") {
-        input = op1 + input;
+    op1 = token[0];
+    if (op1 != "^")
         return [undefined, undefined];
-    }
+    token.shift();
     v1 = B();
     [op2, v2] = Fl();
     if ((op2 == undefined) || (v2 == undefined))
@@ -334,62 +350,61 @@ function Fl() {
 }
 
 function B() {
-    console.log("B");
-    let token = getToken();
-    console.log("token: ", token);
+    console.log("B | ", token);
+    let tk = token[0];
     let v1;
-    if (token == "")
+    token.shift();
+    if (tk == undefined)
         return;
-    if (/[0-9]/.test(token[0])) {
-        console.log("B value: ", Number(token));
-        return Number(token);
+    if (/[0-9]/.test(tk[0])) {
+        console.log("B value: ", Number(tk));
+        return Number(tk);
     }
-    if (token == "e")
+    if (tk == "e")
         return Math.E;
-    if (token == "pi")
+    if (tk == "pi")
         return Math.PI;
-    if (/[a-z]/.test(token[0])) {
-        console.log("token: ", getToken()); // (
-        v1 = E();
-        if ((v1 == null) || (v1 == undefined))
-            return v1;
-    }
-    switch (token) {
+    v1 = E();
+    if (token[0] == ")")
+        token.shift();
+    if ((v1 == null) || (v1 == undefined))
+        return v1;
+    switch (tk) {
         case "(":
-            return E();
-        case "sqrt":
+            return v1;
+        case "sqrt(":
             return Math.sqrt(v1);
-        case "fact":
+        case "fact(":
             return fact(v1);
-        case "abs":
+        case "abs(":
             return Math.abs(v1);
-        case "log":
+        case "log(":
             return Math.log10(v1);
-        case "ln":
+        case "ln(":
             return Math.log(v1);
-        case "sin":
+        case "sin(":
             return Math.sin(v1);
-        case "sinh":
+        case "sinh(":
             return Math.sinh(v1);
-        case "cos":
+        case "cos(":
             return Math.cos(v1);
-        case "cosh":
+        case "cosh(":
             return Math.cosh(v1);
-        case "tan":
+        case "tan(":
             return Math.tan(v1);
-        case "tanh":
+        case "tanh(":
             return Math.tanh(v1);
-        case "asin":
+        case "asin(":
             return Math.asin(v1);
-        case "asinh":
+        case "asinh(":
             return Math.asinh(v1);
-        case "acos":
+        case "acos(":
             return Math.acos(v1);
-        case "acosh":
+        case "acosh(":
             return Math.acosh(v1);
-        case "atan":
+        case "atan(":
             return Math.atan(v1);
-        case "atanh":
+        case "atanh(":
             return Math.atanh(v1);
     }
 }
