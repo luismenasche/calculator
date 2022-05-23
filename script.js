@@ -22,6 +22,7 @@ function btClick(ev) {
         l--;
     const last = (l > 0) ? expr[l - 1] : null;
     let value = el.getAttribute("data-value");
+    let closed = false;
     switch (type) {
         case "a":
             if (value == "l") {
@@ -143,8 +144,11 @@ function btClick(ev) {
             radian = !radian;
             break;
         case "s":
-            while ((l > 0) && (/[0-9pie.%\s)]/.test(expr[l - 1])))
+            while ((l > 0) && (/[0-9pie.%\s)]/.test(expr[l - 1]))) {
+                if (expr[l - 1] == ")")
+                    closed = true;
                 l--;
+            }
             if (l == 0) {
                 expr = "-" + expr;
                 break;
@@ -152,7 +156,12 @@ function btClick(ev) {
             l--;
             switch (expr[l]) {
                 case "(":
-                    expr = expr.slice(0,l+1) + "-" + expr.slice(l+1);
+                    if (closed && (expr[l - 1] != "-"))
+                        expr = expr.slice(0,l) + "-" + expr.slice(l);
+                    if (closed && (expr[l - 1] == "-"))
+                        expr = expr.slice(0,l-1) + expr.slice(l);
+                    else
+                        expr = expr.slice(0,l+1) + "-" + expr.slice(l+1);
                     break;
                 case "+":
                     expr = expr.slice(0,l) + "-" + expr.slice(l+1);
@@ -318,7 +327,7 @@ function T(l = false) {
 
 //l = false => grammar variable F
 //l = true => grammar variable Fl
-//^ should be calculated from right to left
+//^ should be calculated from right to left (simpler with this grammar)
 function F(l = false) {
     let v1, v2, op, vec = [];
     console.log("F" + (l? "l: ": ": "), token);

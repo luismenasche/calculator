@@ -1,6 +1,6 @@
 // Context-Free Grammar
-// with no ambiguities and no left recursion
-// used to build a simple LL parser
+// with no ambiguities and no left-recursion
+// used to build a simple LL(1) parser
 
 E   ->  T El
 El  ->  + T El | - T El | e
@@ -8,4 +8,6 @@ T   ->  F Tl
 Tl  ->  * F Tl | / F Tl | mod F Tl | e
 F   ->  B Fl
 Fl  ->  ^ B Fl | e
-B   -> ( E ) | un ( E ) | num
+B   ->  M Bl
+M   ->  - | e  
+Bl  -> ( E ) | un ( E ) | num
