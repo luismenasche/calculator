@@ -24,10 +24,14 @@ function btClick(ev) {
     let value = el.getAttribute("data-value");
     switch (type) {
         case "a":
-            if (value == "l")
+            if (value == "l") {
                 seq.scrollBy(-40,0);
-            else
+                result.scrollBy(-40,0);
+            }
+            else {
                 seq.scrollBy(40,0);
+                result.scrollBy(40,0);
+            }
             return;
         case "b":
             if (expr[l - 1] == " ")
@@ -84,7 +88,7 @@ function btClick(ev) {
             return;
         case "h":
             hist.classList.add("history--on");
-            break;
+            return;
         case "n":
             if (/[ei)%]/.test(last))
                 return;
@@ -353,8 +357,10 @@ function B() {
     v1 = E();
     if (token[0] == ")")
         token.shift();
-    if ((v1 == null) || (v1 == undefined))
+    if (v1 == undefined)
         return v1;
+    if ((tk != "(") && !radian)
+        v1 = (2 * Math.PI * v1) / 360;
     switch (tk) {
         case "(":
             return v1;
