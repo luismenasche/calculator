@@ -186,10 +186,10 @@ function parse() {
     console.clear();
     tokenize();
     let res = E();
-    if (!res)
+    if (res == undefined)
         return 0;
     else
-        return String(res);
+        return String(round(res, 6));
 }
 
 function tokenize() {
@@ -228,125 +228,111 @@ function tokenize() {
     }
 }
 
-function E(t = false) {
-    console.log("E | ", token);
-    let v1, v2, op, res, vec = [];
-    if (t) {
+//l = false => grammar variable E
+//l = true => grammar variable El
+//+ and - should be calculated from left to right
+function E(l = false) {
+    let v1, v2, op, vec = [];
+    console.log("E" + (l? "l: ": ": "), token);
+    if (l) {
         op = token[0];
         if (!/[+-]/.test(op))
             return;
-        console.log("ENTREI!!!");
-        console.log("op:", op);
         vec.push(op);
-        console.log("vec:", vec);
         token.shift();    
     }
     v1 = T();
-    if (v1 == undefined) {
-        vec.push("\n");
-        return vec;
-    }
+    if (v1 == undefined)
+        return;
     vec.push(v1);
-    v2 = E(1);
+    v2 = E(true);
     if (v2 != undefined)
         vec = vec.concat(v2);
-    console.log("vec:", vec);
-    if (vec[vec.length - 1] == "")
-    res = vec[0];
-    for (let i = 1; i < vec.length; i += 2) {
-        op = vec[i];
-        switch (op) {
-            case "+":
-                res += vec[i + 1];
-                break;
-            case "-":
-                res -= vec[i + 1];
-                break;
+    if (l)
+        return vec;
+    else {
+        let res = vec[0];
+        for (let i = 1; i < vec.length; i += 2) {
+            op = vec[i];
+            switch (op) {
+                case "+":
+                    res += vec[i + 1];
+                    break;
+                case "-":
+                    res -= vec[i + 1];
+                    break;
+            }
         }
+        return res;
     }
-    return res;
 }
 
-/*function El() {
-    console.log("El | ", token);
-    let v1, v2; 
-    let op1, op2;
-    op1 = token[0];
-    if (!/[+-]/.test(op1))
-        return undefined;
-    token.shift();
-    v1 = T();
-    [op2, v2] = El();
-    if ((op2 == undefined) || (v2 == undefined))
-        return [op1, v1];
-    switch (op2) {
-        case "+":
-            return [op1, v1 + v2];
-        case "-":
-            return [op1, v1 - v2];
+//l = false => grammar variable T
+//l = true => grammar variable Tl
+//*, / and mod should be calculated from left to right
+function T(l = false) {
+    let v1, v2, op, vec = [];
+    console.log("T" + (l? "l: ": ": "), token);
+    if (l) {
+        op = token[0];
+        if (!/[*/]/.test(op) && (op != "mod"))
+            return;
+        vec.push(op);
+        token.shift();    
     }
-}*/
-
-function T() {
-    console.log("T | ", token);
-    let v1, v2, op;
     v1 = F();
-    [op, v2] = Tl();
-    if ((op == undefined) || (v2 == undefined))
-        return v1;
-    switch (op) {
-        case "*":
-            return v1 * v2;
-        case "/":
-            return v1 / v2;
-        case "mod":
-            return (v1 >= 0) ? (v1 % v2) : (v1 % v2 + v2);
+    if (v1 == undefined)
+        return;
+    vec.push(v1);
+    v2 = T(true);
+    if (v2 != undefined)
+        vec = vec.concat(v2);
+    if (l)
+        return vec;
+    else {
+        let res = vec[0];
+        for (let i = 1; i < vec.length; i += 2) {
+            op = vec[i];
+            switch (op) {
+                case "*":
+                    res *= vec[i+1];
+                    break;
+                case "/":
+                    res /= vec[i+1];
+                    break;
+                case "mod":
+                    if (res >= 0)
+                        res %= vec[i + 1];
+                    else
+                        res = res % vec[i + 1] + vec[i + 1];
+                    break;
+            }
+        }
+        return res;
     }
 }
 
-function Tl() {
-    console.log("Tl | ", token);
-    let v1, v2, op1, op2;
-    op1 = token[0];
-    if (!/[*/]/.test(op1) && (op1 != "mod"))
-        return [undefined, undefined];
-    token.shift();
-    v1 = F();
-    [op2, v2] = Tl();
-    if ((op2 == undefined) || (v2 == undefined))
-        return [op1, v1];
-    switch (op2) {
-        case "*":
-            return [op1, v1 * v2];
-        case "/":
-            return [op1, v1 / v2];
-        case "mod":
-            return [op1, (v1 >= 0) ? (v1 % v2) : (v1 % v2 + v2)];
+//l = false => grammar variable F
+//l = true => grammar variable Fl
+//^ should be calculated from right to left
+function F(l = false) {
+    let v1, v2, op, vec = [];
+    console.log("F" + (l? "l: ": ": "), token);
+    if (l) {
+        op = token[0];
+        if (op != "^")
+            return;
+        vec.push(op);
+        token.shift();    
     }
-}
-
-function F() {
-    console.log("F | ", token);
-    let v1, v2, op;
     v1 = B();
-    [op, v2] = Fl();
-    if ((op == undefined) || (v2 == undefined))
+    if (v1 == undefined)
+        return;
+    v2 = F(true);
+    if (v2 == undefined)
         return v1;
-    return v1 ** v2;
-}
-
-function Fl() {
-    console.log("Fl  | ", token);
-    let v1, v2, op1, op2;
-    op1 = token[0];
-    if (op1 != "^")
-        return [undefined, undefined];
-    token.shift();
-    v1 = B();
-    [op2, v2] = Fl();
-    if ((op2 == undefined) || (v2 == undefined))
-        return [op1, v1];
-    return [op1, v1 ** v2];
+    else
+        return v1 ** v2;
 }
 
 function B() {
@@ -416,6 +402,10 @@ function fact(n) {
     for (let i = 2; i <= n; i++)
         f *= i;
     return f;
+}
+
+function round(x, d) {
+    return Math.round(x * (10 ** d)) / (10 ** d);
 }
 
 function updateHistory(first, second, newItem = true) {
