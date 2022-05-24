@@ -22,7 +22,7 @@ function btClick(ev) {
         l--;
     const last = (l > 0) ? expr[l - 1] : null;
     let value = el.getAttribute("data-value");
-    let closed = false;
+    let closedPar = 0; // for case "s"
     switch (type) {
         case "a":
             if (value == "l") {
@@ -144,9 +144,13 @@ function btClick(ev) {
             radian = !radian;
             break;
         case "s":
-            while ((l > 0) && (/[0-9pie.%\s)]/.test(expr[l - 1]))) {
+            while ((l > 0) && (/[0-9pie.%\s()]/.test(expr[l - 1]))) {
                 if (expr[l - 1] == ")")
-                    closed = true;
+                    closedPar++;
+                else if ((expr[l - 1] == "(") && (closedPar > 0))
+                    closedPar--;
+                else if ((expr[l - 1] == "(") && (closedPar == 0))
+                    break;
                 l--;
             }
             if (l == 0) {
@@ -156,12 +160,7 @@ function btClick(ev) {
             l--;
             switch (expr[l]) {
                 case "(":
-                    if (closed && (expr[l - 1] != "-"))
-                        expr = expr.slice(0,l) + "-" + expr.slice(l);
-                    if (closed && (expr[l - 1] == "-"))
-                        expr = expr.slice(0,l-1) + expr.slice(l);
-                    else
-                        expr = expr.slice(0,l+1) + "-" + expr.slice(l+1);
+                    expr = expr.slice(0,l+1) + "-" + expr.slice(l+1);
                     break;
                 case "+":
                     expr = expr.slice(0,l) + "-" + expr.slice(l+1);
@@ -202,7 +201,7 @@ function parse() {
     if (res == undefined)
         return 0;
     else
-        return String(round(res, 6));
+        return String(round(res));
 }
 
 function tokenize() {
@@ -350,26 +349,33 @@ function F(l = false) {
 
 function B() {
     console.log("B | ", token);
+    let minus = 1;
     let tk = token[0];
     let v1;
+    if (tk == "-") {
+        minus = -1;
+        token.shift();
+        tk = token[0];
+    }
     token.shift();
     if (tk == undefined)
         return;
     if (/[0-9]/.test(tk[0])) {
         console.log("B value: ", Number(tk));
-        return Number(tk);
+        return minus * Number(tk);
     }
     if (tk == "e")
-        return Math.E;
+        return minus * Math.E;
     if (tk == "pi")
-        return Math.PI;
+        return minus * Math.PI;
     v1 = E();
     if (token[0] == ")")
         token.shift();
     if (v1 == undefined)
-        return v1;
+        return;
     if ((tk != "(") && !radian)
         v1 = (2 * Math.PI * v1) / 360;
+    v1 *= minus;
     switch (tk) {
         case "(":
             return v1;
@@ -419,7 +425,7 @@ function fact(n) {
     return f;
 }
 
-function round(x, d) {
+function round(x, d = 6) {
     return Math.round(x * (10 ** d)) / (10 ** d);
 }
 
