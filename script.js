@@ -22,7 +22,6 @@ function btClick(ev) {
         l--;
     const last = (l > 0) ? expr[l - 1] : null;
     let value = el.getAttribute("data-value");
-    let closedPar = 0; // for case "s"
     switch (type) {
         case "a":
             if (value == "l") {
@@ -144,13 +143,17 @@ function btClick(ev) {
             radian = !radian;
             break;
         case "s":
-            while ((l > 0) && (/[0-9pie.%\s()]/.test(expr[l - 1]))) {
+            while ((l > 0) && (/[0-9pie.%\s)]/.test(expr[l - 1]))) {
+                let closedPar = 0;
                 if (expr[l - 1] == ")")
                     closedPar++;
-                else if ((expr[l - 1] == "(") && (closedPar > 0))
-                    closedPar--;
-                else if ((expr[l - 1] == "(") && (closedPar == 0))
-                    break;
+                while (closedPar > 0) {
+                    l--;
+                    if (expr[l - 1] == ")")
+                        closedPar++;
+                    else if (expr[l - 1] == "(")
+                        closedPar--;
+                }
                 l--;
             }
             if (l == 0) {
