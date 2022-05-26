@@ -53,6 +53,10 @@ function btClick(ev) {
                 while ((l > 0) && (/[a-z]/.test(expr[l - 1])))
                     l--;
             }
+            else if (/[+\-*/^]/.test(last))
+                l--;
+            else if (last == "d")
+                l -= 3;
             expr = expr.slice(0,l);
             break;
         case "c":
@@ -199,7 +203,6 @@ function btClick(ev) {
 
 function parse() {
     console.clear();
-    //preprocess(); //processes the % operator
     tokenize();
     let res = E();
     if (res == undefined)
@@ -207,37 +210,6 @@ function parse() {
     else
         return String(round(res));
 }
-
-/*//processes the % operator
-function preprocess() {
-    let lper = expr.length;
-    let lbeg, op;
-    while (lper > 0) {
-        while ((lper > 0) && (expr[lper - 1] != "%"))
-            lper--;
-        if (lper == 0)
-            return;
-        lbeg = --lper;
-        while ((lbeg > 0) && (expr[lbeg - 1] != " ")) {
-            let closedPar = 0;
-            if (expr[lbeg - 1] == ")")
-                closedPar++;
-            while (closedPar > 0) {
-                lbeg--;
-                if (expr[lbeg - 1] == ")")
-                    closedPar++;
-                else if (expr[lbeg - 1] == "(")
-                    closedPar--;
-                }
-            lbeg--;
-        }
-        op = lbeg - 2;
-        break;
-    }
-    console.log(expr[lper]);
-    console.log(expr.slice(lbeg,lper));
-    console.log(expr[op]);
-}*/
 
 function tokenize() {
     let i = 0, c;
@@ -301,8 +273,18 @@ function E(l = false) {
         return vec;
     else {
         let res = vec[0];
+        if (res.length == 2)
+            res = res[0] / 100;
+        else
+            res = res[0];
         for (let i = 1; i < vec.length; i += 2) {
+            let t = vec[i + 1]
+            if (t.length == 2)
+                vec[i + 1] = (vec[i + 1][0] / 100) * res;
+            else
+                vec[i + 1] = vec[i + 1][0];
             op = vec[i];
+            console.log("ENTREI: ", t, op, vec[i+1]);
             switch (op) {
                 case "+":
                     res += vec[i + 1];
@@ -332,14 +314,22 @@ function T(l = false) {
     v1 = F();
     if (v1 == undefined)
         return;
-    vec.push(v1);
+    if (vec == [])
+        vec.push(v1);
+    else {
+        if (v1.length == 2)
+            vec.push(v1[0] / 100);
+        else
+            vec.push(v1[0]);
+    }
     v2 = T(true);
-    if (v2 != undefined)
+    if (v2 != undefined) 
         vec = vec.concat(v2);
     if (l)
         return vec;
     else {
         let res = vec[0];
+        console.log("VEC[0]: ", res);
         for (let i = 1; i < vec.length; i += 2) {
             op = vec[i];
             switch (op) {
@@ -357,7 +347,8 @@ function T(l = false) {
                     break;
             }
         }
-        return res;
+        console.log("RETORNO: ", [res]);
+        return [res];
     }
 }
 
@@ -365,28 +356,39 @@ function T(l = false) {
 //l = true => grammar variable Fl
 //^ should be calculated from right to left (simpler with this grammar)
 function F(l = false) {
-    let v1, v2, op, vec = [];
+    let v1, v2, op;
     console.log("F" + (l? "l: ": ": "), token);
     if (l) {
         op = token[0];
         if (op != "^")
             return;
-        vec.push(op);
         token.shift();    
     }
     v1 = B();
     if (v1 == undefined)
         return;
     v2 = F(true);
-    if (v2 == undefined)
+    if (v2 == undefined) {
+        console.log("RETORNO: ", v1);
         return v1;
-    else
-        return v1 ** v2;
+    }
+    else {
+        if (v1.length == 2)
+            v1 = v1[0] / 100;
+        else
+            v1 = v1[0];
+        if (v2.length == 2)
+            v2 = v2[0] / 100;
+        else
+            v2 = v2[0];
+        return [v1 ** v2];
+    }
 }
 
 function B() {
     console.log("B | ", token);
     let signal = 1;
+    let per = [];
     let tk = token[0];
     let v1;
     if (tk == "-") {
@@ -397,17 +399,26 @@ function B() {
     if (tk == undefined)
         return;
     token.shift();
+    if (((/[0-9]/.test(tk[0])) || (tk == "e") || (tk == "pi")) &&
+        (token[0] == "%")) {
+            per = ["%"];
+            token.shift();
+    }
     if (/[0-9]/.test(tk[0])) {
         console.log("B value: ", Number(tk));
-        return signal * Number(tk);
+        return [signal * Number(tk)].concat(per);
     }
     if (tk == "e")
-        return signal * Math.E;
+        return [signal * Math.E].concat(per);
     if (tk == "pi")
-        return signal * Math.PI;
+        return [signal * Math.PI].concat(per);
     v1 = E();
     if (token[0] == ")")
         token.shift();
+    if (token[0] == "%") {
+        per = ["%"];
+        token.shift();
+    }
     if (v1 == undefined)
         return;
     if (!radian && (tk.startsWith("sin") || tk.startsWith("cos") || 
@@ -470,7 +481,7 @@ function B() {
     if (!radian && tk.startsWith("a") && (tk.includes("sin") || 
         tk.includes("cos") || tk.includes("tan")))
             v1 = (360 * v1) / (2 * Math.PI);
-    return v1;
+    return [v1].concat(per);
 }
 
 function fact(n) {
