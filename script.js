@@ -53,8 +53,6 @@ function btClick(ev) {
                 while ((l > 0) && (/[a-z]/.test(expr[l - 1])))
                     l--;
             }
-            if (expr[l - 1] == " ")
-                l--;
             expr = expr.slice(0,l);
             break;
         case "c":
@@ -143,7 +141,7 @@ function btClick(ev) {
             radian = !radian;
             break;
         case "s":
-            while ((l > 0) && (/[0-9pie.%\s)]/.test(expr[l - 1]))) {
+            while ((l > 0) && (/[0-9a-z.%\s)]/.test(expr[l - 1]))) {
                 let closedPar = 0;
                 if (expr[l - 1] == ")")
                     closedPar++;
@@ -182,6 +180,8 @@ function btClick(ev) {
         case "%":
             if (/[.+\-*/d(^%]/.test(last))
                 return;
+            if (expr == "")
+                return;
             decimal = false
             expr += value;
             break;
@@ -199,6 +199,7 @@ function btClick(ev) {
 
 function parse() {
     console.clear();
+    //preprocess(); //processes the % operator
     tokenize();
     let res = E();
     if (res == undefined)
@@ -206,6 +207,37 @@ function parse() {
     else
         return String(round(res));
 }
+
+/*//processes the % operator
+function preprocess() {
+    let lper = expr.length;
+    let lbeg, op;
+    while (lper > 0) {
+        while ((lper > 0) && (expr[lper - 1] != "%"))
+            lper--;
+        if (lper == 0)
+            return;
+        lbeg = --lper;
+        while ((lbeg > 0) && (expr[lbeg - 1] != " ")) {
+            let closedPar = 0;
+            if (expr[lbeg - 1] == ")")
+                closedPar++;
+            while (closedPar > 0) {
+                lbeg--;
+                if (expr[lbeg - 1] == ")")
+                    closedPar++;
+                else if (expr[lbeg - 1] == "(")
+                    closedPar--;
+                }
+            lbeg--;
+        }
+        op = lbeg - 2;
+        break;
+    }
+    console.log(expr[lper]);
+    console.log(expr.slice(lbeg,lper));
+    console.log(expr[op]);
+}*/
 
 function tokenize() {
     let i = 0, c;
@@ -236,7 +268,9 @@ function tokenize() {
             let l = i;
             do {
                 l++;
-            } while ((l < expr.length) && /[a-z(]/.test(expr[l]));
+            } while ((l < expr.length) && /[a-z]/.test(expr[l]));
+            if (expr[l] == "(")
+                l++;
             token.push(expr.slice(i,l));
             i = l;
         }
@@ -352,71 +386,91 @@ function F(l = false) {
 
 function B() {
     console.log("B | ", token);
-    let minus = 1;
+    let signal = 1;
     let tk = token[0];
     let v1;
     if (tk == "-") {
-        minus = -1;
+        signal = -1;
         token.shift();
         tk = token[0];
     }
-    token.shift();
     if (tk == undefined)
         return;
+    token.shift();
     if (/[0-9]/.test(tk[0])) {
         console.log("B value: ", Number(tk));
-        return minus * Number(tk);
+        return signal * Number(tk);
     }
     if (tk == "e")
-        return minus * Math.E;
+        return signal * Math.E;
     if (tk == "pi")
-        return minus * Math.PI;
+        return signal * Math.PI;
     v1 = E();
     if (token[0] == ")")
         token.shift();
     if (v1 == undefined)
         return;
-    if ((tk != "(") && !radian)
-        v1 = (2 * Math.PI * v1) / 360;
-    v1 *= minus;
+    if (!radian && (tk.startsWith("sin") || tk.startsWith("cos") || 
+        tk.startsWith("tan")))
+            v1 = (2 * Math.PI * v1) / 360;
+    v1 *= signal;
     switch (tk) {
-        case "(":
-            return v1;
         case "sqrt(":
-            return Math.sqrt(v1);
+            v1 = Math.sqrt(v1);
+            break;
         case "fact(":
-            return fact(v1);
+            v1 = fact(v1);
+            break;
         case "abs(":
-            return Math.abs(v1);
+            v1 = Math.abs(v1);
+            break;
         case "log(":
-            return Math.log10(v1);
+            v1 = Math.log10(v1);
+            break;
         case "ln(":
-            return Math.log(v1);
+            v1 = Math.log(v1);
+            break;
         case "sin(":
-            return Math.sin(v1);
+            v1 = Math.sin(v1);
+            break;
         case "sinh(":
-            return Math.sinh(v1);
+            v1 = Math.sinh(v1);
+            break;
         case "cos(":
-            return Math.cos(v1);
+            v1 = Math.cos(v1);
+            break;
         case "cosh(":
-            return Math.cosh(v1);
+            v1 = Math.cosh(v1);
+            break;
         case "tan(":
-            return Math.tan(v1);
+            v1 = Math.tan(v1);
+            break;
         case "tanh(":
-            return Math.tanh(v1);
+            v1 = Math.tanh(v1);
+            break;
         case "asin(":
-            return Math.asin(v1);
+            v1 = Math.asin(v1);
+            break;
         case "asinh(":
-            return Math.asinh(v1);
+            v1 = Math.asinh(v1);
+            break;
         case "acos(":
-            return Math.acos(v1);
+            v1 = Math.acos(v1);
+            break;
         case "acosh(":
-            return Math.acosh(v1);
+            v1 = Math.acosh(v1);
+            break;
         case "atan(":
-            return Math.atan(v1);
+            v1 = Math.atan(v1);
+            break;
         case "atanh(":
-            return Math.atanh(v1);
+            v1 = Math.atanh(v1);
+            break;
     }
+    if (!radian && tk.startsWith("a") && (tk.includes("sin") || 
+        tk.includes("cos") || tk.includes("tan")))
+            v1 = (360 * v1) / (2 * Math.PI);
+    return v1;
 }
 
 function fact(n) {
