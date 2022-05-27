@@ -272,11 +272,7 @@ function E(l = false) {
     if (l)
         return vec;
     else {
-        let res = vec[0];
-        if (res.length == 2)
-            res = res[0] / 100;
-        else
-            res = res[0];
+        let res = simplifyPer(vec[0]);
         for (let i = 1; i < vec.length; i += 2) {
             let t = vec[i + 1]
             if (t.length == 2)
@@ -284,7 +280,6 @@ function E(l = false) {
             else
                 vec[i + 1] = vec[i + 1][0];
             op = vec[i];
-            console.log("ENTREI: ", t, op, vec[i+1]);
             switch (op) {
                 case "+":
                     res += vec[i + 1];
@@ -294,7 +289,7 @@ function E(l = false) {
                     break;
             }
         }
-        return res;
+        return [res];
     }
 }
 
@@ -314,22 +309,20 @@ function T(l = false) {
     v1 = F();
     if (v1 == undefined)
         return;
-    if (vec == [])
-        vec.push(v1);
-    else {
-        if (v1.length == 2)
-            vec.push(v1[0] / 100);
-        else
-            vec.push(v1[0]);
-    }
+    if (vec.length != 0)
+        v1 = simplifyPer(v1);
+    vec.push(v1);
     v2 = T(true);
-    if (v2 != undefined) 
+    if (v2 != undefined)
         vec = vec.concat(v2);
     if (l)
         return vec;
     else {
-        let res = vec[0];
-        console.log("VEC[0]: ", res);
+        let res;
+        if (vec.length == 1)
+            return vec[0];
+        else
+            res = simplifyPer(vec[0]);
         for (let i = 1; i < vec.length; i += 2) {
             op = vec[i];
             switch (op) {
@@ -347,7 +340,6 @@ function T(l = false) {
                     break;
             }
         }
-        console.log("RETORNO: ", [res]);
         return [res];
     }
 }
@@ -368,21 +360,10 @@ function F(l = false) {
     if (v1 == undefined)
         return;
     v2 = F(true);
-    if (v2 == undefined) {
-        console.log("RETORNO: ", v1);
+    if (v2 == undefined)
         return v1;
-    }
-    else {
-        if (v1.length == 2)
-            v1 = v1[0] / 100;
-        else
-            v1 = v1[0];
-        if (v2.length == 2)
-            v2 = v2[0] / 100;
-        else
-            v2 = v2[0];
-        return [v1 ** v2];
-    }
+    else
+        return [simplifyPer(v1) ** simplifyPer(v2)];
 }
 
 function B() {
@@ -404,10 +385,8 @@ function B() {
             per = ["%"];
             token.shift();
     }
-    if (/[0-9]/.test(tk[0])) {
-        console.log("B value: ", Number(tk));
+    if (/[0-9]/.test(tk[0]))
         return [signal * Number(tk)].concat(per);
-    }
     if (tk == "e")
         return [signal * Math.E].concat(per);
     if (tk == "pi")
@@ -423,8 +402,8 @@ function B() {
         return;
     if (!radian && (tk.startsWith("sin") || tk.startsWith("cos") || 
         tk.startsWith("tan")))
-            v1 = (2 * Math.PI * v1) / 360;
-    v1 *= signal;
+            v1[0] = (2 * Math.PI * v1[0]) / 360;
+    v1 = signal * v1[0];
     switch (tk) {
         case "sqrt(":
             v1 = Math.sqrt(v1);
@@ -491,6 +470,13 @@ function fact(n) {
     for (let i = 2; i <= n; i++)
         f *= i;
     return f;
+}
+
+function simplifyPer(n) {
+    if (n.length == 2)
+        return n[0] / 100;
+    else
+        return n[0];
 }
 
 function round(x, d = 6) {
