@@ -34,8 +34,6 @@ function btClick(ev) {
             }
             return;
         case "b":
-            if (expr[l - 1] == " ")
-                l--;
             l--;
             if (last == ".") {
                 let laux = l;
@@ -50,13 +48,11 @@ function btClick(ev) {
             else if ((last == "(") || /[a-z]/.test(last)) {
                 if (last == "(")
                     openPar --;
-                while ((l > 0) && (/[a-z]/.test(expr[l - 1])))
+                while ((l > 0) && (/[a-z\s]/.test(expr[l - 1])))
                     l--;
             }
             else if (/[+\-*/^]/.test(last))
                 l--;
-            else if (last == "d")
-                l -= 3;
             expr = expr.slice(0,l);
             break;
         case "c":
@@ -96,12 +92,7 @@ function btClick(ev) {
                 return;
             if ((/[0-9]/.test(last)) && (/[ep]/.test(value[0])))
                 return;
-            if (!/[0-9.]/.test(last) && (value == "0")) {
-                expr += "0.";
-                decimal = true;
-            }
-            else
-                expr += value;
+            expr += value;
             break;
         case "o":
             if (/[(.]/.test(last))
@@ -207,8 +198,8 @@ function parse() {
     let res = E();
     if (res == undefined)
         return 0;
-    else
-        return String(round(res));
+    res = res[0];
+    return String(round(res));
 }
 
 function tokenize() {
@@ -400,10 +391,12 @@ function B() {
     }
     if (v1 == undefined)
         return;
+    v1 = v1[0];
+    if ((v1 <= 0) && ((tk == "sqrt(") || (tk == "log(") || (tk == "ln(")))
+        return [0].concat(per);
     if (!radian && (tk.startsWith("sin") || tk.startsWith("cos") || 
         tk.startsWith("tan")))
-            v1[0] = (2 * Math.PI * v1[0]) / 360;
-    v1 = signal * v1[0];
+            v1 = (2 * Math.PI * v1) / 360;
     switch (tk) {
         case "sqrt(":
             v1 = Math.sqrt(v1);
@@ -460,6 +453,7 @@ function B() {
     if (!radian && tk.startsWith("a") && (tk.includes("sin") || 
         tk.includes("cos") || tk.includes("tan")))
             v1 = (360 * v1) / (2 * Math.PI);
+    v1 *= signal;
     return [v1].concat(per);
 }
 
