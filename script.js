@@ -76,7 +76,7 @@ function btClick(ev) {
             break;
         case "e":
             if (expr == "")
-                break;
+                return;
             result.textContent = parse();
             updateHistory(expr, result.textContent);
             expr = "";
@@ -104,7 +104,7 @@ function btClick(ev) {
             }
             else {
                 if (expr == "")
-                    expr += "0";
+                    expr += result.textContent;
                 expr += " " + value + " ";
             }
             decimal = false;
@@ -193,7 +193,6 @@ function btClick(ev) {
 }
 
 function parse() {
-    console.clear();
     tokenize();
     let res = E();
     if (res == undefined)
@@ -245,7 +244,6 @@ function tokenize() {
 //+ and - should be calculated from left to right
 function E(l = false) {
     let v1, v2, op, vec = [];
-    console.log("E" + (l? "l: ": ": "), token);
     if (l) {
         op = token[0];
         if (!/[+-]/.test(op))
@@ -289,7 +287,6 @@ function E(l = false) {
 //*, / and mod should be calculated from left to right
 function T(l = false) {
     let v1, v2, op, vec = [];
-    console.log("T" + (l? "l: ": ": "), token);
     if (l) {
         op = token[0];
         if (!/[*/]/.test(op) && (op != "mod"))
@@ -340,7 +337,6 @@ function T(l = false) {
 //^ should be calculated from right to left (simpler with this grammar)
 function F(l = false) {
     let v1, v2, op;
-    console.log("F" + (l? "l: ": ": "), token);
     if (l) {
         op = token[0];
         if (op != "^")
@@ -358,7 +354,6 @@ function F(l = false) {
 }
 
 function B() {
-    console.log("B | ", token);
     let signal = 1;
     let per = [];
     let tk = token[0];
